@@ -803,10 +803,19 @@ function Schema:validate_field(field, value)
     end
 
   elseif field.type == "foreign" then
-    if field.schema and field.schema.validate_primary_key then
-      local ok, errs = field.schema:validate_primary_key(value, true)
-      if not ok then
-        return nil, errs
+    if field.schema then
+      if type(value) == "table" and field.schema.validate then
+        local ok, errs = field.schema:validate(value, false)
+        if not ok then
+          return nil, errs
+        end
+      end
+
+      if field.schema.validate_primary_key then
+        local ok, errs = field.schema:validate_primary_key(value, true)
+        if not ok then
+          return nil, errs
+        end
       end
     end
 
